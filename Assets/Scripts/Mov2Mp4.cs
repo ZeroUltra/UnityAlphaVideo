@@ -66,12 +66,17 @@ public class Mov2Mp4
     /// <returns></returns>
     public bool GetPathIsNull()
     {
-        if (string.IsNullOrEmpty(saveMovPath) || string.IsNullOrEmpty(seleteMovPath)) return true;
+        if (string.IsNullOrEmpty(saveMovPath) || string.IsNullOrEmpty(seleteMovPath))
+        {
+            DialogMgr.Instance.ShowDialogTypeBtnOne("请选择目录", "错误提示");
+            return true;
+        }
         return false;
     }
 
-    public void RunFFmpeg()
+    public void Convert()
     {
+        if (GetPathIsNull()) return;
         for (int i = 0; i < movFullNameList.Count; i++)
         {
             DatasStruct datas = new DatasStruct();
@@ -88,7 +93,9 @@ public class Mov2Mp4
         DatasStruct data = obj as DatasStruct;
         Process p = new Process();
         p.StartInfo.FileName = ffmpegPath + "/ffmpeg.exe";
-        p.StartInfo.Arguments = $"-i {data.movFileName} -vf \"split[a], pad = iw * 2:ih[b], [a] alphaextract, [b] overlay=w\" -b {codeRate}k -y {data.outFileName}";
+        // p.StartInfo.Arguments = $"-i {data.movFileName} -vf  \"split[a], pad = iw * 2:ih[b], [a] alphaextract, [b] overlay=w\" -b {codeRate}k -y {data.outFileName}";
+        //scale=trunc(iw/2)*2:trunc(ih/2)*2 否则可能遇到“width not divisible by 2”
+        p.StartInfo.Arguments = $"-i {data.movFileName} -vf  \"scale=trunc(iw/2)*2:trunc(ih/2)*2\" -vf \"split[a], pad = iw * 2:ih[b], [a] alphaextract, [b] overlay=w\" -b {codeRate}k -y {data.outFileName}";
         Debug.Log("ffmeeg 信息:  " + p.StartInfo.Arguments);
         p.StartInfo.CreateNoWindow = false;
         p.StartInfo.UseShellExecute = false;

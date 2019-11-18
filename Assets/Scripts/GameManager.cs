@@ -39,4 +39,9 @@ public class GameManager : Singleton<GameManager>
         StandaloneFileBrowser.OpenFolderPanelAsync(title, path, muliSete, cb);
     }
 
+    public void DialogSaveFile(string title,string directory,string fileName, ExtensionFilter[] extensions, Action<string> cb)
+    {
+        StandaloneFileBrowser.SaveFilePanelAsync(title, directory, fileName, extensions,cb);
+    }
+
 }
