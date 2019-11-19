@@ -14,15 +14,15 @@ public class Pic2Video
     private string picStyteType;  //图片样式类型 000.png  %3d.png qwer_00000.png qwer_%5d.png 
     private string ffmpegPath;
 
+   
     public int codeRate = 1000;
     public int frameRate = 25;
-    public event Action<string> OnSeletePicEnd;
+    public event Action<string> OnAddPicEnd;
     public event Action<string> OnSeleteSaveFileEnd;
 
     private ExtensionFilter[] extensions = new[] {
                                                     new ExtensionFilter("Webm Files", "Webm"),
                                                     new ExtensionFilter("Mp4 Files", "mp4"),
-                                                    new ExtensionFilter("mov Files", "mov"),
                                                     new ExtensionFilter("All Files", "*" ),
                                                  };
 
@@ -45,10 +45,18 @@ public class Pic2Video
     {
         if (paths.Length <= 0) return;
         seletePicPath = paths[0]; //当前选择的路径
-        picStyteType = Path.GetFileName(Directory.GetFiles(seletePicPath)[0]);
-        picStyteType = GetPicType(picStyteType);
-        Debug.Log("样式 " + picStyteType);
-        OnSeletePicEnd?.Invoke(paths[0]);
+        if (GameManager.Instance.FolderIsFramePic(seletePicPath))
+        {
+            picStyteType = Path.GetFileName(Directory.GetFiles(seletePicPath)[0]);
+            picStyteType = GetPicType(picStyteType);
+            Debug.Log("样式 " + picStyteType);
+            OnAddPicEnd?.Invoke(paths[0]);
+        }
+        else
+        {
+            DialogMgr.Instance.ShowDialogTypeBtnOne("图片文件有错 第一个文件名:" + picStyteType, "错误");
+            return;
+        }
     }
 
     private string GetPicType(string picType)
@@ -109,7 +117,7 @@ public class Pic2Video
 
         string arguments = Path.GetExtension(saveVideoName) == ".mp4" ? $"-f image2 -i {seletePicPath}/{picStyteType} -vf  \"scale=trunc(iw/2)*2:trunc(ih/2)*2\" -vf \"split[a], pad = iw * 2:ih[b], [a] alphaextract, [b] overlay=w\"  -b {codeRate}k {saveVideoName}" :
                                                                         $"-i {seletePicPath}/{picStyteType} -r {frameRate} -b {codeRate}k -auto-alt-ref 0  -vcodec libvpx  {saveVideoName}";
-    
+
         p.StartInfo.Arguments = arguments;
         Debug.Log("ffmeeg 信息:  " + p.StartInfo.Arguments);
         p.StartInfo.CreateNoWindow = false;
@@ -124,6 +132,22 @@ public class Pic2Video
         data.thread.Abort();
     }
 
+    public void OnDragPicFolder(string folder)
+    {
+        seletePicPath = folder; //当前选择的路径
+        if (GameManager.Instance.FolderIsFramePic(seletePicPath))
+        {
+            picStyteType = Path.GetFileName(Directory.GetFiles(seletePicPath)[0]);
+            picStyteType = GetPicType(picStyteType);
+            Debug.Log("样式 " + picStyteType);
+            OnAddPicEnd?.Invoke(folder);
+        }
+        else
+        {
+            DialogMgr.Instance.ShowDialogTypeBtnOne("图片文件有错 第一个文件名:" + picStyteType, "错误");
+        }
+    }
+
     private void ShowDiglog()
     {
         DialogMgr.Instance.ShowDialogTypeBtnTwo("是否打开文件", "转换完毕", btnOneClickAct: () =>
@@ -132,6 +156,7 @@ public class Pic2Video
                Process.Start("Explorer", "/select," + saveVideoName);
            });
     }
+
     private class DatasStruct
     {
         public Thread thread;

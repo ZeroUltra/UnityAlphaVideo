@@ -10,12 +10,11 @@ using Debug = UnityEngine.Debug;
 public class Mov2Mp4
 {
     private string seleteMovPath, saveMovPath;  //选择视频路径  保存路径
-    private List<string> movFullNameList = new List<string>(); //全路径名字 c:/XXX/xxx/test.mov
-    private List<string> movNameList = new List<string>();  //test
+    private List<string> movFileList = new List<string>(); //全路径名字 c:/XXX/xxx/test.mov
     private string ffmpegPath;
 
     public int codeRate = 1000;
-    public event Action<string[]> OnSeleteMovEnd;
+    public event Action<string[]> OnAddMovFiles;
     public event Action<string> OnSeleteFolderEnd;
 
     private ExtensionFilter[] extensions = new[] {
@@ -41,12 +40,9 @@ public class Mov2Mp4
     private void SeleteMovEnd(string[] paths)
     {
         if (paths.Length <= 0) return;
-        movFullNameList.Clear();
-        movNameList.Clear();
-        movFullNameList.AddRange(paths);  //添加所有全路径
-        movFullNameList.ForEach((path) => movNameList.Add(Path.GetFileNameWithoutExtension(path))); //添加文件名
+        movFileList.AddRange(paths);  //添加所有全路径
         seleteMovPath = Path.GetDirectoryName(paths[0]); //当前选择的路径
-        OnSeleteMovEnd?.Invoke(paths);
+        OnAddMovFiles?.Invoke(movFileList.ToArray());
     }
 
     public void OpenFolder()
@@ -66,7 +62,7 @@ public class Mov2Mp4
     /// <returns></returns>
     public bool GetPathIsNull()
     {
-        if (string.IsNullOrEmpty(saveMovPath) || string.IsNullOrEmpty(seleteMovPath))
+        if (string.IsNullOrEmpty(saveMovPath) || movFileList.Count == 0)
         {
             DialogMgr.Instance.ShowDialogTypeBtnOne("请选择目录", "错误提示");
             return true;
@@ -77,14 +73,14 @@ public class Mov2Mp4
     public void Convert()
     {
         if (GetPathIsNull()) return;
-        for (int i = 0; i < movFullNameList.Count; i++)
+        for (int i = 0; i < movFileList.Count; i++)
         {
             DatasStruct datas = new DatasStruct();
             Thread thread = new Thread(RunFFmpegExe);
             datas.thread = thread;
-            datas.movFileName = movFullNameList[i];
-            datas.outFileName = $"{saveMovPath}/{ movNameList[i]}.mp4";
-            if (i == movFullNameList.Count - 1) datas.showEndDialog = true;
+            datas.movFileName = movFileList[i];
+            datas.outFileName = $"{saveMovPath}/{ Path.GetFileNameWithoutExtension(movFileList[i])}.mp4";
+            if (i == movFileList.Count - 1) datas.showEndDialog = true;
             thread.Start(datas);
         }
     }
@@ -108,6 +104,19 @@ public class Mov2Mp4
         if (data.showEndDialog)
             Loom.QueueOnMainThread(() => ShowDiglog());
         data.thread.Abort();
+    }
+
+    public void ClearMovList()
+    {
+        movFileList.Clear();
+        OnAddMovFiles?.Invoke(movFileList.ToArray());
+    }
+
+    public void AddDragFile(string[] movfile)
+    {
+      
+        movFileList.AddRange(movfile);
+        OnAddMovFiles?.Invoke(movFileList.ToArray());
     }
 
     private void ShowDiglog()

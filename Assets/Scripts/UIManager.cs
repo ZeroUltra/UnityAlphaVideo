@@ -6,6 +6,8 @@ using UnityEngine.UI;
 using DG.Tweening;
 public class UIManager : MonoBehaviour
 {
+    public FileDragAndDrop fileDragAndDrop;
+    [Space(5)]
     #region UI
     public Toggle[] togs;
     public RectTransform[] content;
@@ -13,6 +15,7 @@ public class UIManager : MonoBehaviour
     [Header("MOV2MP4")]
     [Space(5)]
     public Button btnOpenMovFile;
+    public Button btnClear;
     public Button btnFolder;
     public Button btnConvertMov;
     public Text txtMovList, txtSeletePath;
@@ -28,8 +31,36 @@ public class UIManager : MonoBehaviour
 
     private Mov2Mp4 mov2Mp4;
     private Pic2Video pic2Video;
+
     private void Start()
     {
+
+
+        #region MOV2MP4
+        mov2Mp4 = new Mov2Mp4();
+        fileDragAndDrop.OnMovFileDragEnd += (files) => mov2Mp4.AddDragFile(files);
+
+        btnOpenMovFile.onClick.AddListener(OpenMovFile);
+        btnClear.onClick.AddListener(mov2Mp4.ClearMovList);
+        btnFolder.onClick.AddListener(OpenMovFolder);
+        btnConvertMov.onClick.AddListener(ConvertMov);
+        mov2Mp4.OnAddMovFiles += Mov2Mp4_OnSeleteMovEnd;
+        mov2Mp4.OnSeleteFolderEnd += Mov2Mp4_OnSeleteFolderEnd;
+        inputRate.onValueChanged.AddListener((num) => mov2Mp4.codeRate = int.Parse(num));
+        #endregion
+
+        #region Pic2Video
+        pic2Video = new Pic2Video();
+        fileDragAndDrop.OnPicFolderDragEnd += (file) => pic2Video.OnDragPicFolder(file);
+        pic2Video.OnAddPicEnd += Pic2Video_OnSeletePicEnd;
+        pic2Video.OnSeleteSaveFileEnd += Pic2Video_OnSeleteSaveFileEnd;
+        btnSeletePicFolder.onClick.AddListener(OpenPicFolder);
+        btnSeleteSaveVideo.onClick.AddListener(SavePicVideo);
+        btnConvertPic.onClick.AddListener(PicConvertVideo);
+        inputCodeRate.onValueChanged.AddListener((num) => pic2Video.codeRate = int.Parse(num));
+        inputFrameRate.onValueChanged.AddListener((num) => pic2Video.frameRate = int.Parse(num));
+        #endregion
+
         for (int i = 0; i < togs.Length; i++)
         {
             int index = i;
@@ -37,32 +68,7 @@ public class UIManager : MonoBehaviour
             if (index == 0) { togs[index].isOn = true; togs[index].image.color = Color.green; }
             else togs[index].isOn = false;
         }
-
-        #region MOV2MP4
-        mov2Mp4 = new Mov2Mp4();
-        btnOpenMovFile.onClick.AddListener(OpenMovFile);
-        btnFolder.onClick.AddListener(OpenMovFolder);
-        btnConvertMov.onClick.AddListener(ConvertMov);
-        mov2Mp4.OnSeleteMovEnd += Mov2Mp4_OnSeleteMovEnd;
-        mov2Mp4.OnSeleteFolderEnd += Mov2Mp4_OnSeleteFolderEnd;
-        inputRate.onValueChanged.AddListener((num) => mov2Mp4.codeRate = int.Parse(num));
-        #endregion
-
-        #region Pic2Video
-        pic2Video = new Pic2Video();
-        pic2Video.OnSeletePicEnd += Pic2Video_OnSeletePicEnd;
-        pic2Video.OnSeleteSaveFileEnd += Pic2Video_OnSeleteSaveFileEnd;
-        btnSeletePicFolder.onClick.AddListener(OpenPicFolder);
-        btnSeleteSaveVideo.onClick.AddListener(SavePicVideo);
-        btnConvertPic.onClick.AddListener(PicConvertVideo);
-        inputCodeRate.onValueChanged.AddListener((num) => pic2Video.codeRate = int.Parse(num));
-        inputFrameRate.onValueChanged.AddListener((num) => pic2Video.frameRate = int.Parse(num));
-
-
-        #endregion
     }
-
-
 
     private void OnTogChange(int index, bool ison)
     {
@@ -70,6 +76,7 @@ public class UIManager : MonoBehaviour
         {
             togs[index].image.color = Color.green;
             content[index].DOScaleX(1, 0.4f);
+
         }
         else
         {
@@ -100,8 +107,9 @@ public class UIManager : MonoBehaviour
 
     private void Mov2Mp4_OnSeleteMovEnd(string[] paths)
     {
-        txtMovList.text = "";
         txtMovList.color = Color.white;
+        txtMovList.text = "";
+
         foreach (var item in paths)
         {
             txtMovList.text += item + "\n";

@@ -8,7 +8,7 @@ public class GameManager : Singleton<GameManager>
 {
     public static string FFMpegPath;
     public UnityEngine.UI.Image dragImg;
-  
+
     protected override void Awake()
     {
         base.Awake();
@@ -39,9 +39,37 @@ public class GameManager : Singleton<GameManager>
         StandaloneFileBrowser.OpenFolderPanelAsync(title, path, muliSete, cb);
     }
 
-    public void DialogSaveFile(string title,string directory,string fileName, ExtensionFilter[] extensions, Action<string> cb)
+    public void DialogSaveFile(string title, string directory, string fileName, ExtensionFilter[] extensions, Action<string> cb)
     {
-        StandaloneFileBrowser.SaveFilePanelAsync(title, directory, fileName, extensions,cb);
+        StandaloneFileBrowser.SaveFilePanelAsync(title, directory, fileName, extensions, cb);
     }
 
+    public bool FileIsMov(string fileName)
+    {
+        return Path.GetExtension(fileName).ToLower() == ".mov";
+    }
+
+    public bool FolderIsFramePic(string folder)
+    {
+        DirectoryInfo directoryInfo = new DirectoryInfo(folder);
+        //看第一个文件扩展名是否是图片文件 然后检查所有的文件
+        string exName = Path.GetExtension(directoryInfo.GetFiles()[0].Name).ToLower();
+        if (exName == ".png" || exName == ".jpg" || exName == ".bmp")
+        {
+            //然后查看所有文件
+            FileInfo[] files = directoryInfo.GetFiles();
+            foreach (var item in files)
+            {
+                if (item.Extension != exName)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 }
