@@ -3,17 +3,19 @@ using System.IO;
 using System;
 using SFB;
 
-
 public class GameManager : Singleton<GameManager>
 {
     public static string FFMpegPath;
-    public UnityEngine.UI.Image dragImg;
 
     protected override void Awake()
     {
         base.Awake();
         Loom.Initialize();
-        FFMpegPath = Application.streamingAssetsPath + "/FFmpeg/bin";
+        FFMpegPath = Application.streamingAssetsPath + "/FFmpeg/bin/ffmpeg.exe";
+        if (!File.Exists(FFMpegPath))
+        {
+            DialogMgr.Instance.ShowDialogTypeBtnOne($"{FFMpegPath}\n文件夹不存在ffmpeg,请检查", "错误");
+        }
     }
 
 
@@ -38,17 +40,33 @@ public class GameManager : Singleton<GameManager>
     {
         StandaloneFileBrowser.OpenFolderPanelAsync(title, path, muliSete, cb);
     }
-
+    /// <summary>
+    /// 保存文件
+    /// </summary>
+    /// <param name="title"></param>
+    /// <param name="directory"></param>
+    /// <param name="fileName"></param>
+    /// <param name="extensions"></param>
+    /// <param name="cb"></param>
     public void DialogSaveFile(string title, string directory, string fileName, ExtensionFilter[] extensions, Action<string> cb)
     {
         StandaloneFileBrowser.SaveFilePanelAsync(title, directory, fileName, extensions, cb);
     }
 
+    /// <summary>
+    /// 是否为mov文件
+    /// </summary>
+    /// <param name="fileName"></param>
+    /// <returns></returns>
     public bool FileIsMov(string fileName)
     {
         return Path.GetExtension(fileName).ToLower() == ".mov";
     }
-
+    /// <summary>
+    /// 文件是否为序列帧文件夹
+    /// </summary>
+    /// <param name="folder"></param>
+    /// <returns></returns>
     public bool FolderIsFramePic(string folder)
     {
         DirectoryInfo directoryInfo = new DirectoryInfo(folder);
