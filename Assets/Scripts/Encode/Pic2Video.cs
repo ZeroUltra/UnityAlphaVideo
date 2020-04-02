@@ -38,7 +38,7 @@ public class Pic2Video
     {
         if (string.IsNullOrEmpty(seletePicPath))
         {
-            seletePicPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            seletePicPath = GameManager.DesktopPath;
         }
         else
         {
@@ -81,7 +81,7 @@ public class Pic2Video
     //选择视频保存文件
     public void SaveVideoFile()
     {
-        if (string.IsNullOrEmpty(saveVideoPath)) { saveVideoPath = Application.dataPath; }
+        if (string.IsNullOrEmpty(saveVideoPath)) { saveVideoPath = GameManager.DesktopPath; }
         GameManager.Instance.DialogSaveFile("选择保存路径", saveVideoPath, new DirectoryInfo(seletePicPath).Name, extensions, SeleteSaveEnd);
     }
 

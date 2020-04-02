@@ -61,7 +61,7 @@ public class Mov2Video
     /// </summary>
     public void OpenSaveFolder()
     {
-        if (string.IsNullOrEmpty(saveMovPath)) { saveMovPath = Application.dataPath; }
+        if (string.IsNullOrEmpty(saveMovPath)) { saveMovPath = GameManager.DesktopPath; }
         GameManager.Instance.DialogOpenFolder("选择保存路径", saveMovPath, SeleteFolderEnd, false);
     }
     private void SeleteFolderEnd(string[] paths)

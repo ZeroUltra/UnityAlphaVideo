@@ -6,12 +6,14 @@ using SFB;
 public class GameManager : Singleton<GameManager>
 {
     public static string FFMpegPath;
+    public static string DesktopPath;
 
     protected override void Awake()
     {
         base.Awake();
         Loom.Initialize();
         FFMpegPath = Application.streamingAssetsPath + "/FFmpeg/bin/ffmpeg.exe";
+        DesktopPath= Environment.GetFolderPath(Environment.SpecialFolder.Desktop); 
         if (!File.Exists(FFMpegPath))
         {
             DialogMgr.Instance.ShowDialogTypeBtnOne($"{FFMpegPath}\n文件夹不存在ffmpeg,请检查", "错误");
