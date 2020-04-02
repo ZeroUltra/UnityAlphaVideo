@@ -42,7 +42,7 @@ public class Mov2Video
     #region 选择mov文件
     public void OpenMovFile()
     {
-        if (string.IsNullOrEmpty(seleteMovPath)) { seleteMovPath = Application.dataPath; }
+        if (string.IsNullOrEmpty(seleteMovPath)) { seleteMovPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop); }
         GameManager.Instance.DialogOpenFile("请选择一个mov", seleteMovPath, extensions, SeleteMovEnd, true);
     }
     //选择文件mov文件结束

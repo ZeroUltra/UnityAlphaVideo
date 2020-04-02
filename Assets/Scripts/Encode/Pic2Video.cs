@@ -36,7 +36,14 @@ public class Pic2Video
     //打开图片序列路径
     public void OpenPicFolder()
     {
-        if (string.IsNullOrEmpty(seletePicPath)) { seletePicPath = Application.dataPath; }
+        if (string.IsNullOrEmpty(seletePicPath))
+        {
+            seletePicPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+        }
+        else
+        {
+            seletePicPath = Directory.GetParent(seletePicPath).FullName; //打开上级文件
+        }
         GameManager.Instance.DialogOpenFolder("请选择图片序列", seletePicPath, SeletePicEnd, false);
     }
 
@@ -44,7 +51,8 @@ public class Pic2Video
     private void SeletePicEnd(string[] paths)
     {
         if (paths.Length <= 0) return;
-        seletePicPath = paths[0]; //当前选择的路径
+
+        seletePicPath = paths[0];
         if (GameManager.Instance.FolderIsFramePic(seletePicPath))
         {
             picStyteType = Path.GetFileName(Directory.GetFiles(seletePicPath)[0]);
@@ -80,8 +88,17 @@ public class Pic2Video
     //视频保存选择结束回调
     private void SeleteSaveEnd(string path)
     {
-        saveVideoName = path;
-        OnSeleteSaveFileEnd?.Invoke(path);
+
+        try
+        {
+            saveVideoName = path;
+            saveVideoPath = Path.GetDirectoryName(path);
+            OnSeleteSaveFileEnd?.Invoke(path);
+        }
+        catch (Exception)
+        {
+
+        }
     }
     /// <summary>
     /// 检查路径是否为空
@@ -118,7 +135,7 @@ public class Pic2Video
         DatasStruct data = obj as DatasStruct;
         Process p = new Process();
         //p.StartInfo.FileName = ffmpegPath + "/ffmpeg.exe";
-        p.StartInfo.FileName =GameManager.FFMpegPath;
+        p.StartInfo.FileName = GameManager.FFMpegPath;
         Debug.Log(Path.GetExtension(saveVideoName));
 
         string arguments = Path.GetExtension(saveVideoName) == ".mp4" ? $"-f image2 -i {seletePicPath}/{picStyteType} -vf  \"scale=trunc(iw/2)*2:trunc(ih/2)*2\" -vf \"split[a], pad = iw * 2:ih[b], [a] alphaextract, [b] overlay=w\"  -b {codeRate}k {saveVideoName}" :
