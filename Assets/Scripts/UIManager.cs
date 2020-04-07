@@ -6,12 +6,15 @@ using UnityEngine.UI;
 using DG.Tweening;
 public class UIManager : MonoBehaviour
 {
+    
     public Toggle[] togs;
     public RectTransform[] content;
 
+    public Button btnLink;
+
     private void Start()
     {
-
+        btnLink.onClick.AddListener(() => Application.OpenURL("https://zeroultra.github.io/2020/01-28-UnityAlpahVideo/"));
         for (int i = 0; i < togs.Length; i++)
         {
             int index = i;
