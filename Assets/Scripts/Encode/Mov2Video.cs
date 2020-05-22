@@ -13,6 +13,7 @@ public class Mov2Video
     private string ffmpegPath;
 
     public int codeRate = 1000;
+    public bool addchunk4 = false;
     /// <summary>
     /// 当选择mov文件结束
     /// </summary>
@@ -100,33 +101,38 @@ public class Mov2Video
 
             datas.thread = thread;
             datas.inputMovFileName = movFileList[i];
-            datas.outMp4FileName = $"{saveMovPath}/{ Path.GetFileNameWithoutExtension(movFileList[i])}{exName}";
+            datas.outVideoFileName = $"{saveMovPath}/{ Path.GetFileNameWithoutExtension(movFileList[i])}{exName}";
+            datas.addChunk4 = addchunk4;
 
-            //是否显示dialog 多个mov只展示最后一个dialog  应该根据时间
+            //是否显示dialog 多个mov只展示最后一个dialog  应该根据时间 需要修改
             if (i == movFileList.Count - 1) datas.showEndDialog = true;
 
             thread.Start(datas);
         }
     }
+
     private void RunFFmpegExe(object obj)
     {
         DatasStruct data = obj as DatasStruct;
         Process p = new Process();
         p.StartInfo.FileName = GameManager.FFMpegPath;
-        Debug.Log(data.outMp4FileName);
-        string exName = Path.GetExtension(data.outMp4FileName);
+        Debug.Log(data.outVideoFileName);
+        string exName = Path.GetExtension(data.outVideoFileName);
         switch (exName)
         {
             case ".mp4":
-                p.StartInfo.Arguments = $"-i {data.inputMovFileName} -vf  \"scale=trunc(iw/2)*2:trunc(ih/2)*2\" -vf \"split[a], pad = iw * 2:ih[b], [a] alphaextract, [b] overlay=w\" -b {codeRate}k -y {data.outMp4FileName}";
+                p.StartInfo.Arguments = $"-i {data.inputMovFileName} -vf  \"scale=trunc(iw/2)*2:trunc(ih/2)*2\" -vf \"split[a], pad = iw * 2:ih[b], [a] alphaextract, [b] overlay=w\" -b {codeRate}k -y {data.outVideoFileName}";
                 break;
             case ".webm":
                 //-i text.mov -auto-alt-ref 0 -c:v libvpx -b 1000k  export.webm  //-y是覆盖原来的视频
-                p.StartInfo.Arguments = $"-i {data.inputMovFileName} -auto-alt-ref 0 -c:v libvpx  -b {codeRate}k -y {data.outMp4FileName}";
+                p.StartInfo.Arguments = $"-i {data.inputMovFileName} -auto-alt-ref 0 -c:v libvpx  -b {codeRate}k -y {data.outVideoFileName}";
                 break;
             case ".mov":
                 //ffmpeg -i input.mov -vcodec hap -format hap_alpha output-hap.mov
-                p.StartInfo.Arguments = $"-i {data.inputMovFileName} -vcodec hap -format hap_alpha -y {data.outMp4FileName}";
+                if (!data.addChunk4)
+                    p.StartInfo.Arguments = $"-i {data.inputMovFileName} -vcodec hap -format hap_alpha -y {data.outVideoFileName}";
+                else
+                    p.StartInfo.Arguments = $"-i {data.inputMovFileName} -vcodec hap -format hap_alpha -chunks 4 -y {data.outVideoFileName}";
                 break;
         }
 
@@ -174,7 +180,8 @@ public class Mov2Video
     {
         public Thread thread;
         public string inputMovFileName;
-        public string outMp4FileName;
+        public string outVideoFileName;
+        public bool addChunk4 = false;
         public bool showEndDialog = false;
     }
 }

@@ -14,7 +14,7 @@ public class UIManager : MonoBehaviour
 
     private void Start()
     {
-        btnLink.onClick.AddListener(() => Application.OpenURL("https://zeroultra.github.io/2020/01-28-UnityAlpahVideo/"));
+        btnLink.onClick.AddListener(() => Application.OpenURL("https://github.com/ZeroUltra/UnityAlphaVideo"));
         for (int i = 0; i < togs.Length; i++)
         {
             int index = i;

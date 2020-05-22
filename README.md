@@ -17,3 +17,12 @@
 
    :heart: :heart: :heart: :heart: :heart:
 
+## Change Log
+
+**1.0.3**
+
+​	增加mov `chunk 4`选项,减小包体
+
+**1.0.2** 
+
+​	修复拖入bug
