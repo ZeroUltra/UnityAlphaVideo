@@ -13,7 +13,8 @@ public class UI_Mov2Mp4 : MonoBehaviour
     [SerializeField] Button btnSaveFolder;
     [SerializeField] Button btnConvertMov;
     [SerializeField] Text txtMovList, txtSeletePath;
-    [SerializeField] InputField inputRate;
+    [SerializeField] InputField inputCodeRate;
+    [SerializeField] InputField inputFrameRate;
     [SerializeField] Dropdown dropdownTarget;
     [SerializeField] Toggle chunk4Option;
 
@@ -36,8 +37,9 @@ public class UI_Mov2Mp4 : MonoBehaviour
 
         mov2Mp4.OnAddMovFiles += Mov2Mp4_OnSeleteMovEnd;
         mov2Mp4.OnSeleteSaveFolderEnd += Mov2Mp4_OnSeleteSaveFolderEnd;
-        inputRate.onValueChanged.AddListener((num) => mov2Mp4.codeRate = int.Parse(num));
-        
+        inputCodeRate.onValueChanged.AddListener((num) => mov2Mp4.codeRate = int.Parse(num));
+        inputFrameRate.onValueChanged.AddListener((num) => mov2Mp4.frameRate = int.Parse(num));
+
     }
     /// <summary>
     /// 下拉菜单选项

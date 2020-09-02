@@ -12,7 +12,8 @@ public class Mov2Video
     private List<string> movFileList = new List<string>(); //全路径名字 c:/XXX/xxx/test.mov
     private string ffmpegPath;
 
-    public int codeRate = 1000;
+    public int codeRate = 1000; //码率
+    public int frameRate = 25; //帧率
     public bool addchunk4 = false;
     /// <summary>
     /// 当选择mov文件结束
@@ -121,18 +122,18 @@ public class Mov2Video
         switch (exName)
         {
             case ".mp4":
-                p.StartInfo.Arguments = $"-i {data.inputMovFileName} -vf  \"scale=trunc(iw/2)*2:trunc(ih/2)*2\" -vf \"split[a], pad = iw * 2:ih[b], [a] alphaextract, [b] overlay=w\" -b {codeRate}k -y {data.outVideoFileName}";
+                p.StartInfo.Arguments = $"-i {data.inputMovFileName} -vf  \"scale=trunc(iw/2)*2:trunc(ih/2)*2\" -vf \"split[a], pad = iw * 2:ih[b], [a] alphaextract, [b] overlay=w\" -b {codeRate}k -r {frameRate} -y {data.outVideoFileName}";
                 break;
             case ".webm":
                 //-i text.mov -auto-alt-ref 0 -c:v libvpx -b 1000k  export.webm  //-y是覆盖原来的视频
-                p.StartInfo.Arguments = $"-i {data.inputMovFileName} -auto-alt-ref 0 -c:v libvpx  -b {codeRate}k -y {data.outVideoFileName}";
+                p.StartInfo.Arguments = $"-i {data.inputMovFileName} -auto-alt-ref 0 -c:v libvpx  -r {frameRate} -b {codeRate}k -y {data.outVideoFileName}";
                 break;
             case ".mov":
                 //ffmpeg -i input.mov -vcodec hap -format hap_alpha output-hap.mov
                 if (!data.addChunk4)
-                    p.StartInfo.Arguments = $"-i {data.inputMovFileName} -vcodec hap -format hap_alpha -y {data.outVideoFileName}";
+                    p.StartInfo.Arguments = $"-i {data.inputMovFileName} -vcodec hap -format hap_alpha -r {frameRate} -y {data.outVideoFileName}";
                 else
-                    p.StartInfo.Arguments = $"-i {data.inputMovFileName} -vcodec hap -format hap_alpha -chunks 4 -y {data.outVideoFileName}";
+                    p.StartInfo.Arguments = $"-i {data.inputMovFileName} -vcodec hap -format hap_alpha -chunks 4 -r {frameRate} -y {data.outVideoFileName}";
                 break;
         }
 
