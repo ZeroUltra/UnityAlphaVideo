@@ -5,6 +5,10 @@
 
 ---
 
+### 相关文章连接
+
+​	[Unity播放透明视频的几种方式 ](https://zeroultra.github.io/2020/01-28-UnityAlpahVideo/)
+
 ### 原理
 
 使用[ffmpeg](http://ffmpeg.org/)命令转换,将ffmpeg 放在StreamingAssets文件夹中传入相应的指令启动
@@ -18,6 +22,10 @@
    :heart: :heart: :heart: :heart: :heart:
 
 ## Change Log
+
+**1.0.5**
+
+​	修改了一些bug
 
 **1.0.4**
 
