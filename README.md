@@ -7,7 +7,7 @@
 
 ### 相关文章连接
 
-​	[Unity播放透明视频的几种方式 ](https://zeroultra.github.io/2020/01-28-UnityAlpahVideo/)
+​	[Unity播放透明视频的几种方式 ](https://zeroultra.github.io/2020/01-28-2020-1-28-UnityAlpahVideo/)
 
 ### 原理
 
